@@ -1573,7 +1573,7 @@ static bool do_exploit()
 
 	printf("Grabbin' HAXX\n");
 
-	if (IOS_GetVersion() != (u32)HAXX_IOS || (ios_rev != 5663 && ios_rev != 5662 && ios_rev != 3869 && ios_rev != 5919))
+	if (IOS_GetVersion() != (u32)HAXX_IOS /* || (ios_rev != 5663 && ios_rev != 5662 && ios_rev != 3869 && ios_rev != 5919) */)
 	{
 		printf("Wrong IOS version (%08x). Update IOS%d to the latest version.\n", read32(0x3140), (u32)HAXX_IOS);
 		return false;
