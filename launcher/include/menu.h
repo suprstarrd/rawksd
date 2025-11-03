@@ -76,7 +76,7 @@ public:
 	enum {
 		LaunchImage = 0,
 		SettingsImage,
-		UninstallImage,
+		InstallImage,
 		ExitImage
 	};
 
@@ -86,6 +86,8 @@ public:
 	~ButtonList();
 
 	void SetButton(int index, const char* text, int imageindex);
+	void SetButtonLaunch(GuiWindow* window, int index, const char* text);
+
 	GuiButton* GetButton(int index);
 
 	int Pressed();

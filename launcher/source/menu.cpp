@@ -32,10 +32,10 @@ GuiText* Subtitle;
 
 extern "C" {
 	extern u8 background_png[];
-	extern u8 launch_over_png[];
-	extern u8 exit_over_png[];
-	extern u8 settings_over_png[];
-	extern u8 uninstall_over_png[];
+	extern u8 p_png[];
+	extern u8 exit_png[];
+	extern u8 s_png[];
+	extern u8 i_png[];
 }
 
 static lwp_t guithread = LWP_THREAD_NULL;
@@ -126,15 +126,15 @@ void MainMenu(Menus::Enum menu)
 	Window->SetFocus(true);
 	Window->Append(Background);
 	
-	Title = new GuiText(RIIVOLUTION_TITLE, 32, (GXColor){255, 255, 255, 255});
+	Title = new GuiText(RIIVOLUTION_TITLE, 32, (GXColor){0, 0, 0, 255});
 	Title->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-	Title->SetPosition(56, 32);
+	Title->SetPosition(100, 424);
 	// TODO: Title->SetItalic(true);
 	Window->Append(Title);
 
-	Subtitle = new GuiText("Loading...", 18, (GXColor){255, 255, 255, 255});
+	Subtitle = new GuiText("Loading...", 24, (GXColor){215, 215, 215, 255});
 	Subtitle->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-	Subtitle->SetPosition(74, 78);
+	Subtitle->SetPosition(92, 50);
 	Window->Append(Subtitle);
 
 	Trigger[Triggers::Select].SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
@@ -209,10 +209,10 @@ GuiImageData* ButtonList::ImageData[4];
 
 void ButtonList::InitImageData()
 {
-	ImageData[LaunchImage] = new GuiImageData(launch_over_png);
-	ImageData[SettingsImage] = new GuiImageData(settings_over_png);
-	ImageData[UninstallImage] = new GuiImageData(uninstall_over_png);
-	ImageData[ExitImage] = new GuiImageData(exit_over_png);
+	ImageData[LaunchImage] = new GuiImageData(p_png);
+	ImageData[SettingsImage] = new GuiImageData(s_png);
+	ImageData[InstallImage] = new GuiImageData(i_png);
+	ImageData[ExitImage] = new GuiImageData(exit_png);
 }
 
 ButtonList::ButtonList(GuiWindow* window, int items)
@@ -220,45 +220,74 @@ ButtonList::ButtonList(GuiWindow* window, int items)
 	Window = window;
 	Count = items;
 
-	Text = new GuiText*[Count];
-	TextOver = new GuiText*[Count];
-	Buttons = new GuiButton*[Count];
-	Images = new GuiImage*[Count];
+	Text = new GuiText*[Count + 1];
+	TextOver = new GuiText*[Count + 1];
+	Buttons = new GuiButton*[Count + 1];
+	Images = new GuiImage*[Count + 1];
 
-	for (int i = 0; i < Count; i++) {
-		Text[i] = new GuiText("", 24, (GXColor){0, 0, 0, 255});
-		TextOver[i] = new GuiText("", 24, (GXColor){128, 0, 0, 255});
+	for (int i = 0; i < items; i++) {
+		Text[i] = new GuiText("", 16, (GXColor){255, 255, 255, 255});
+		TextOver[i] = new GuiText("", 16, (GXColor){210, 210, 210, 255});
 		Text[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-		Text[i]->SetPosition(0, 0);
+		Text[i]->SetPosition(12, 2);
 		TextOver[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-		TextOver[i]->SetPosition(0, 0);
-		Buttons[i] = new GuiButton(128, 24);
+		TextOver[i]->SetPosition(12, 2);
+		Buttons[i] = new GuiButton(72, 48);
 		Buttons[i]->SetLabel(Text[i]);
 		Buttons[i]->SetLabelOver(TextOver[i]);
 		Buttons[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 		Buttons[i]->SetTrigger(&Trigger[Triggers::Select]);
 		Buttons[i]->SetRumble(true);
-		Buttons[i]->SetEffectGrow();
-		Buttons[i]->SetPosition(536, 192 + (18 + 32) * (3 - i)); // First button is at the bottom
+//    	Buttons[i]->SetEffectOnOver(EFFECT_FADE, 2, 50);
+		Buttons[i]->SetPosition(472 - i*72 + i*6, 27); // First button is at the right - add 72 to 472 if you want a third button
 		Window->Append(Buttons[i]);
 
 		Images[i] = NULL;
 	}
 }
 
-void ButtonList::SetButton(int index, const char* text, int imageindex)
+void ButtonList::SetButtonLaunch(GuiWindow* window, int index, const char* text)
 {
-	if (Images[index])
-		delete Images[index];
+	Window = window;
+
+	Text[index] = new GuiText("", 16, (GXColor){0, 0, 0, 255});
+	TextOver[index] = new GuiText("", 16, (GXColor){80, 80, 80, 255});
+	Text[index]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	Text[index]->SetPosition(16, 26);
+	TextOver[index]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	TextOver[index]->SetPosition(16, 26);
+	Buttons[index] = new GuiButton(106, 106);
+	Buttons[index]->SetLabel(Text[index]);
+	Buttons[index]->SetLabelOver(TextOver[index]);
+	Buttons[index]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	Buttons[index]->SetTrigger(&Trigger[Triggers::Select]);
+	Buttons[index]->SetRumble(true);
+//	Buttons[index]->SetEffectOnOver(EFFECT_FADE, 2, 50);
+	Buttons[index]->SetPosition(490, 358);
+	Window->Append(Buttons[index]);
+
+	Images[index] = NULL;
 
 	Text[index]->SetText(text);
 	TextOver[index]->SetText(text);
 
-	Images[index] = new GuiImage(ImageData[imageindex]);
-	Images[index]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-	Images[index]->SetPosition(536, 192 + (18 + 32) * (3 - index));
-	Window->Append(Images[index]);
+	Images[index] = new GuiImage(ImageData[LaunchImage]);
+	Buttons[index]->SetImage(Images[index]);
+
+	Count = MAX(Count, index + 1);
 }
+
+void ButtonList::SetButton(int index, const char* text, int imageindex)
+{
+
+	Text[index]->SetText(text);
+	TextOver[index]->SetText(text);    
+
+	Images[index] = new GuiImage(ImageData[imageindex]);
+	Buttons[index]->SetImage(Images[index]);
+
+}
+
 
 int ButtonList::Pressed()
 {
